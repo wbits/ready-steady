@@ -33,18 +33,10 @@ func main() {
 func NewUniverse() Universe {
 	u := make(Universe, height*width)
 	for i := range u {
-		u[i] = NewCell(i%height, i%width)
+		u[i] = Cell{row: i%height, col: i%width, alive: false}
 	}
 
 	return u
-}
-
-func NewCell(row int, col int) Cell {
-	c := Cell{}
-	c.row = row
-	c.col = col
-	c.alive = false
-	return c
 }
 
 func (u Universe) Seed() {
