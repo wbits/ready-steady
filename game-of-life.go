@@ -23,14 +23,13 @@ func main() {
 	for {
 		steps++
 		time.Sleep(time.Second)
-		Step(u, NewUniverse())
+		print("\x0c")
+		u = u.Step()
 		u.Show()
-		if steps == 30 {
+		if steps >= 5 {
 			break
 		}
 	}
-
-
 }
 
 func NewUniverse() Universe {
@@ -52,7 +51,6 @@ func (u Universe) Seed() {
 }
 
 func (u Universe) Show() {
-	print("\x0c")
 	for r := 0; r < height; r++ {
 		row := ""
 		for c := 0; c < width; c++ {
@@ -107,13 +105,13 @@ func (u Universe) Next(x, y int) bool {
 }
 
 
-func Step(a, b Universe) {
-	for r := range a {
-		for c := range a[r] {
-			b[r][c] = a.Next(c, r)
+func (u Universe) Step() Universe {
+	newUniverse := NewUniverse()
+	for r := range u {
+		for c := range u[r] {
+			newUniverse[r][c] = u.Next(c, r)
 		}
 	}
 
-	a = b
-	a.Show()
+	return newUniverse
 }
