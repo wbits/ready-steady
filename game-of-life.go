@@ -11,76 +11,93 @@ const (
 	height = 15
 )
 
-type Universe [][]bool
+type Universe []Cell
+type Cell struct {
+	row int
+	col int
+	alive bool
+}
 
 func main() {
-	u := NewUniverse()
-	u.Seed()
-	u.Show()
+	a, b := NewUniverse(), NewUniverse()
+	a.Seed()
 
-	steps := 0
-
-	for {
-		steps++
-		time.Sleep(time.Second)
-		print("\x0c")
-		u = u.Step()
-		u.Show()
-		if steps >= 5 {
-			break
-		}
+	for i := 0; i < 30; i++ {
+		a.Show()
+		Step(a, b)
+		time.Sleep(time.Second / 2)
+		a, b = b, a // Swap universes
 	}
 }
 
 func NewUniverse() Universe {
-	u := make(Universe, height)
-	for r := range u {
-		u[r] = make([]bool, width)
+	u := make(Universe, height*width)
+	for i := range u {
+		u[i] = NewCell(i%height, i%width)
 	}
 
 	return u
 }
 
+func NewCell(row int, col int) Cell {
+	c := Cell{}
+	c.row = row
+	c.col = col
+	c.alive = false
+	return c
+}
+
 func (u Universe) Seed() {
 	for row := range u {
-		for cell := range u[row] {
-			rand.Seed(time.Now().UnixNano())
-			u[row][cell] = rand.Intn(4) == 0
-		}
+		rand.Seed(time.Now().UnixNano())
+		u[row].alive = rand.Intn(4) == 0
 	}
 }
 
+func (u Universe) String() string {
+	buffer := make([]byte, 0, len(u))
+	for index, cell := range u {
+		byteCharacter := byte(' ')
+		if cell.alive {
+			byteCharacter = '*'
+		}
+		buffer = append(buffer, byteCharacter)
+		if index%width == 0 {
+			buffer = append(buffer, '\n')
+		}
+	}
+
+	return string(buffer)
+}
+
+// Show clears the screen and displays the universe.
 func (u Universe) Show() {
-	for r := 0; r < height; r++ {
-		row := ""
-		for c := 0; c < width; c++ {
-			if u[r][c] {
-				row += " * "
-			} else {
-				row += "   "
-			}
-		}
-		fmt.Println(row)
-	}
+	fmt.Print("\x0c", u.String())
 }
 
 
-func (u Universe) Alive(x, y int) bool {
-	b := (x+width) % width
-	a := (y+height) % height
-
-	return u[a][b]
+func (u Universe) Alive(column, row int) bool {
+	return u.Cell(column, row).alive
 }
 
-func (u Universe) Neighbors(x, y int) int {
+func (u Universe) Cell(column, row int) Cell {
+	return u[u.Index(column, row)]
+}
+
+func (u Universe) Index(column, row int) int {
+	column = (column + width) % width
+	row = (row + height) % height
+
+	return (row * width) + column
+}
+
+func (u Universe) Neighbors(column, row int) int {
 	count := 0
-	for i := -1; i<2; i++ {
-		c := i + x
-		r := i + y
-		if c == x && r == y {
-			continue
-		}
-		if u.Alive(c, r) {
+	for i := -1; i<=1; i++ {
+		c := i + column
+		r := i + row
+		cell := u.Cell(c, r)
+		if !(c == column && r == row) && cell.alive {
 			count++
 		}
 	}
@@ -88,13 +105,9 @@ func (u Universe) Neighbors(x, y int) int {
 	return count
 }
 
-func (u Universe) Next(x, y int) bool {
-	// A live cell with less than two live neighbors dies.
-	//A live cell with two or three live neighbors lives on to the next generation.
-	//A live cell with more than three live neighbors dies.
-	//A dead cell with exactly three live neighbors becomes a live cell.
-	neighbors := u.Neighbors(x, y)
-	if u.Alive(x, y) {
+func (u Universe) Next(column, row int) bool {
+	neighbors := u.Neighbors(column, row)
+	if u.Alive(column, row) {
 		if neighbors < 2 || neighbors > 3 {
 			return false
 		}
@@ -105,13 +118,8 @@ func (u Universe) Next(x, y int) bool {
 }
 
 
-func (u Universe) Step() Universe {
-	newUniverse := NewUniverse()
-	for r := range u {
-		for c := range u[r] {
-			newUniverse[r][c] = u.Next(c, r)
-		}
+func Step(a, b Universe) {
+	for i, cell := range a {
+		b[i].alive = a.Next(cell.col, cell.row)
 	}
-
-	return newUniverse
 }
