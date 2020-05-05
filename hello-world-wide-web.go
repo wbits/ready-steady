@@ -13,8 +13,11 @@ func index(writer http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", index)
-	err := http.ListenAndServe(":3333", nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", index)
+	mux.HandleFunc("/foo", index)
+
+	err := http.ListenAndServe(":3333", mux)
 	if err != nil {
 		fmt.Println(err)
 	}
