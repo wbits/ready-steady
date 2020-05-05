@@ -57,5 +57,15 @@ func main() {
 		coordinate{18.0, 39.0, 0.0, 'N'},
 		coordinate{226.0, 12.0, 0.0, 'E'})
 
-	fmt.Printf("%.2f", mars.distance(mountSharp, olympusMons))
+	earth := newWorld(	6371.0)
+	london := newLocation(
+		coordinate{51.0, 30.0, 0, 'W'},
+		coordinate{0, 0, 8, 'W'})
+	paris := newLocation(
+		coordinate{4, 8, 51, 'N'},
+		coordinate{2, 21.0, 0.0, 'E'})
+
+	fmt.Printf("%.2f\n", mars.distance(mountSharp, olympusMons))
+	fmt.Printf("%.2f\n", earth.distance(london, paris))
+
 }
