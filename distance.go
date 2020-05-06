@@ -67,5 +67,4 @@ func main() {
 
 	fmt.Printf("%.2f\n", mars.distance(mountSharp, olympusMons))
 	fmt.Printf("%.2f\n", earth.distance(london, paris))
-
 }
