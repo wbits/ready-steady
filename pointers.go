@@ -9,6 +9,12 @@ type person struct {
 	age              int
 }
 
+func somePointer() *string {
+	v := "foo"
+
+	return &v
+}
+
 func main() {
 	answer := 42
 	memoryAddress := &answer
@@ -36,4 +42,5 @@ func main() {
 	superpowers := &[3]string{"flying", "invisibility", "super strength"}
 	fmt.Println(superpowers[0])
 	fmt.Println(superpowers[2:3])
+	fmt.Println(*somePointer())
 }
