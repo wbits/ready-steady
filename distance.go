@@ -22,7 +22,7 @@ type coordinate struct {
 func (c coordinate) decimal() float64 {
 	sign := 1.0
 	switch c.h {
-	case 'S', 'W', 's', 'w':
+	case 'S', 'W', 's', 'writer':
 		sign = -1
 	}
 	return sign * (c.d + c.m/60 + c.s/3600)
